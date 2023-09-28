@@ -3,8 +3,6 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
     },
-    "rust-analyzer.linkedProjects": [
-        "./Cargo.toml",
-        "./Cargo.toml"
-    ]
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "rust-analyzer.linkedProjects": ["./Cargo.toml"]
 }
