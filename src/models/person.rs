@@ -1,6 +1,6 @@
-use serde;
+use serde::{Deserialize, Serialize};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Person {
     pub id: Option<String>,
     pub nickname: String,
