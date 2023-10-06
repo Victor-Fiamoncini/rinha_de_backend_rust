@@ -9,5 +9,5 @@ edition = "2021"
 actix-web = "4.4.0"
 dotenv = "0.15.0"
 serde = { version = "1.0.188", features = ["derive"] }
-sqlx = { version = "0.7.2", features = ["runtime-async-std-native-tls", "postgres"] }
+sqlx = { version = "0.7.2", features = ["macros", "postgres", "runtime-async-std-native-tls", "uuid"] }
 uuid = { version = "1.4.1", features = ["v4"] }
