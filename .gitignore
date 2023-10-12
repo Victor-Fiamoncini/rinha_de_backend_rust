@@ -24,4 +24,7 @@ rust-project.json
 ### Env
 .env.local
 
+### Docker volumes
+.docker
+
 # End of https://www.toptal.com/developers/gitignore/api/rust,rust-analyzer
