@@ -10,7 +10,7 @@ mod models;
 use handlers::{count_persons, fetch_person_by_id, fetch_person_by_term, store_person};
 
 pub struct AppState {
-    pub database_client: Pool<Postgres>,
+    database_pool: Pool<Postgres>,
 }
 
 #[actix_web::main]
@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let app_state = AppState {
-            database_client: postgres_pool.clone(),
+            database_pool: postgres_pool.clone(),
         };
 
         App::new()

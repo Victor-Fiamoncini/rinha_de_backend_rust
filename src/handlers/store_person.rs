@@ -1,10 +1,15 @@
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{
+    post,
+    web::{self, Data},
+    HttpResponse, Responder,
+};
 use regex::Regex;
+use uuid::Uuid;
 
-use crate::models::NewPerson;
+use crate::{models::NewPerson, AppState};
 
 #[post("/pessoas")]
-pub async fn store_person(new_person: web::Json<NewPerson>) -> impl Responder {
+async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -> impl Responder {
     if new_person.nickname.is_empty() || new_person.nickname.len() > 32 {
         return HttpResponse::BadRequest();
     }
@@ -19,14 +24,32 @@ pub async fn store_person(new_person: web::Json<NewPerson>) -> impl Responder {
         return HttpResponse::BadRequest();
     }
 
+    let mut stringfied_techs = String::new();
+
     match &new_person.stack {
         Some(stack) => {
             if stack.iter().any(|tech| tech.is_empty() || tech.len() > 32) {
                 return HttpResponse::BadRequest();
             }
+
+            stringfied_techs = stack.join(", ");
         }
         None => {}
     }
 
-    HttpResponse::Created()
+    let insert_result = sqlx::query(
+        "INSERT INTO persons (id, nickname, name, birth, stack) VALUES ($1, $2, $3, $4, $5)",
+    )
+    .bind(Uuid::new_v4())
+    .bind(&new_person.nickname)
+    .bind(&new_person.name)
+    .bind(&new_person.birth)
+    .bind(stringfied_techs)
+    .execute(&state.database_pool)
+    .await;
+
+    match insert_result {
+        Ok(_) => HttpResponse::Created(),
+        Err(_) => HttpResponse::InternalServerError(),
+    }
 }
