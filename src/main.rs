@@ -10,7 +10,7 @@ mod models;
 use handlers::{count_persons, fetch_person_by_id, fetch_person_by_term, store_person};
 
 pub struct AppState {
-    database_pool: Pool<Postgres>,
+    pub database_pool: Pool<Postgres>,
 }
 
 #[actix_web::main]
