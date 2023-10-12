@@ -6,11 +6,11 @@ services:
         image: postgres:15-alpine
         ports:
             - 5432:5432
-        environment:
-            POSTGRES_USER: superuser
-            POSTGRES_PASSWORD: superpassword
+        env_file:
+            - .env.local
         volumes:
-            - rinha_de_backend_postgres_data:/var/lib/postgresql/data
+            - ./.docker/rinha_de_backend_postgres_data:/var/lib/postgresql/data:rw
+            - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
         networks:
             - rinha_de_backend
 
@@ -19,4 +19,4 @@ networks:
         driver: bridge
 
 volumes:
-    rinha_de_backend_postgres_data:
+  rinha_de_backend_postgres_data:
