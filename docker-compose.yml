@@ -7,7 +7,7 @@ services:
         ports:
             - 5432:5432
         env_file:
-            - .env.local
+            - .env
         volumes:
             - ./.docker/rinha_de_backend_postgres_data:/var/lib/postgresql/data:rw
             - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
