@@ -1,15 +1,10 @@
-use actix_web::{
-    get, post,
-    web::{self},
-    HttpResponse, Responder,
-};
+use actix_web::{post, web, HttpResponse, Responder};
 use regex::Regex;
-use serde::Deserialize;
 
 use crate::models::NewPerson;
 
 #[post("/pessoas")]
-async fn store_person(new_person: web::Json<NewPerson>) -> impl Responder {
+pub async fn store_person(new_person: web::Json<NewPerson>) -> impl Responder {
     if new_person.nickname.is_empty() || new_person.nickname.len() > 32 {
         return HttpResponse::BadRequest();
     }
@@ -34,24 +29,4 @@ async fn store_person(new_person: web::Json<NewPerson>) -> impl Responder {
     }
 
     HttpResponse::Created()
-}
-
-#[get("/pessoas/{id}")]
-async fn fetch_person_by_id(path: web::Path<(String,)>) -> impl Responder {
-    HttpResponse::Ok()
-}
-
-#[derive(Deserialize)]
-struct FetchPersonByTermParams {
-    pub t: String,
-}
-
-#[get("/pessoas")]
-async fn fetch_person_by_term(query: web::Query<FetchPersonByTermParams>) -> impl Responder {
-    HttpResponse::Ok()
-}
-
-#[get("/contagem-pessoas")]
-async fn count_persons() -> impl Responder {
-    HttpResponse::Ok()
 }

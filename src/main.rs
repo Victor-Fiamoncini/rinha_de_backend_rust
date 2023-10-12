@@ -7,6 +7,8 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 mod handlers;
 mod models;
 
+use handlers::{count_persons, fetch_person_by_id, fetch_person_by_term, store_person};
+
 pub struct AppState {
     pub database_client: Pool<Postgres>,
 }
@@ -31,10 +33,10 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(Data::new(app_state))
-            .service(handlers::store_person)
-            .service(handlers::fetch_person_by_id)
-            .service(handlers::fetch_person_by_term)
-            .service(handlers::count_persons)
+            .service(store_person::store_person)
+            .service(fetch_person_by_id::fetch_person_by_id)
+            .service(fetch_person_by_term::fetch_person_by_term)
+            .service(count_persons::count_persons)
     })
     .bind(("127.0.0.1", 5555))?
     .run()
