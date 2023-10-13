@@ -1608,6 +1608,7 @@ dependencies = [
  "dotenv",
  "regex",
  "serde",
+ "serde_json",
  "sqlx",
  "uuid",
 ]
