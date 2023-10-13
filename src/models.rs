@@ -1,19 +1,20 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sqlx::FromRow;
 
 #[derive(Debug, Deserialize)]
 pub struct NewPerson {
     #[serde(rename(deserialize = "apelido"))]
-    pub nickname: String,
+    pub nickname: Option<Value>,
 
     #[serde(rename(deserialize = "nome"))]
-    pub name: String,
+    pub name: Option<Value>,
 
     #[serde(rename(deserialize = "nascimento"))]
-    pub birth: String,
+    pub birth: Option<Value>,
 
     #[serde(rename(deserialize = "stack"))]
-    pub stack: Option<Vec<String>>,
+    pub stack: Option<Value>,
 }
 
 #[derive(Debug, FromRow, Serialize)]
