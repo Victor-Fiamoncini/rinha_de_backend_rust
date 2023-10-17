@@ -10,12 +10,16 @@ use crate::{models::NewPerson, AppState};
 
 #[post("/pessoas")]
 async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -> impl Responder {
+    let mut stringfied_nickname = String::new();
+
     match &new_person.nickname {
         Some(nickname) => {
             if let Some(nickname_str) = nickname.as_str() {
                 if nickname_str.is_empty() || nickname_str.len() > 32 {
                     return HttpResponse::UnprocessableEntity();
                 }
+
+                stringfied_nickname = nickname_str.to_string();
             } else {
                 return HttpResponse::BadRequest();
             }
@@ -25,12 +29,16 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         }
     }
 
+    let mut stringfied_name = String::new();
+
     match &new_person.name {
         Some(name) => {
             if let Some(name_str) = name.as_str() {
                 if name_str.is_empty() || name_str.len() > 100 {
                     return HttpResponse::UnprocessableEntity();
                 }
+
+                stringfied_name = name_str.to_string();
             } else {
                 return HttpResponse::BadRequest();
             }
@@ -39,6 +47,8 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
             return HttpResponse::UnprocessableEntity();
         }
     }
+
+    let mut stringfied_birth = String::new();
 
     match &new_person.birth {
         Some(birth) => {
@@ -48,6 +58,8 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
                 if birth_str.is_empty() || !dateformat_regex.is_match(birth_str) {
                     return HttpResponse::UnprocessableEntity();
                 }
+
+                stringfied_birth = birth_str.to_string();
             } else {
                 return HttpResponse::BadRequest();
             }
@@ -88,19 +100,15 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         "INSERT INTO persons (id, nickname, name, birth, stack) VALUES ($1, $2, $3, $4, $5)",
     )
     .bind(Uuid::new_v4())
-    .bind(&new_person.nickname)
-    .bind(&new_person.name)
-    .bind(&new_person.birth)
+    .bind(stringfied_nickname)
+    .bind(stringfied_name)
+    .bind(stringfied_birth)
     .bind(stringfied_techs)
     .execute(&state.database_pool)
     .await;
 
     match insert_result {
         Ok(_) => HttpResponse::Created(),
-        Err(err) => {
-            println!("{}", err);
-
-            return HttpResponse::UnprocessableEntity();
-        }
+        Err(_) => HttpResponse::UnprocessableEntity(),
     }
 }
