@@ -20,8 +20,17 @@ pub struct NewPerson {
 #[derive(Debug, FromRow, Serialize)]
 pub struct StoredPerson {
     pub id: String,
+
     pub nickname: String,
+
     pub name: String,
+
     pub birth: String,
+
     pub stack: Option<Vec<String>>,
+}
+
+#[derive(Debug, FromRow, Serialize)]
+pub struct PersonsCount {
+    pub count: i64,
 }
