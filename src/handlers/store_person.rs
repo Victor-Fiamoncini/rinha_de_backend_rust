@@ -69,22 +69,18 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         }
     }
 
-    let mut stringfied_techs = String::new();
+    let mut vectorized_techs = Vec::new();
 
     match &new_person.stack {
         Some(stack) => {
             if let Some(stack_vec) = stack.as_array() {
-                for (index, tech) in stack_vec.iter().enumerate() {
+                for tech in stack_vec.iter() {
                     if let Some(tech_str) = tech.as_str() {
                         if tech_str.is_empty() || tech_str.len() > 32 {
                             return HttpResponse::UnprocessableEntity();
                         }
 
-                        stringfied_techs.push_str(&tech_str);
-
-                        if index < stack_vec.len() - 1 {
-                            stringfied_techs.push_str(", ");
-                        }
+                        vectorized_techs.push(tech_str);
                     } else {
                         return HttpResponse::BadRequest();
                     }
@@ -94,8 +90,6 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         None => {}
     }
 
-    println!("{}", stringfied_techs);
-
     let insert_result = sqlx::query(
         "INSERT INTO persons (id, nickname, name, birth, stack) VALUES ($1, $2, $3, $4, $5)",
     )
@@ -103,7 +97,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     .bind(stringfied_nickname)
     .bind(stringfied_name)
     .bind(stringfied_birth)
-    .bind(stringfied_techs)
+    .bind(vectorized_techs)
     .execute(&state.database_pool)
     .await;
 
