@@ -13,7 +13,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     let mut stringfied_nickname = String::new();
 
     match &new_person.nickname {
-        Some(nickname) => {
+        Some(ref nickname) => {
             if let Some(nickname_str) = nickname.as_str() {
                 if nickname_str.is_empty() || nickname_str.len() > 32 {
                     return HttpResponse::UnprocessableEntity();
@@ -32,7 +32,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     let mut stringfied_name = String::new();
 
     match &new_person.name {
-        Some(name) => {
+        Some(ref name) => {
             if let Some(name_str) = name.as_str() {
                 if name_str.is_empty() || name_str.len() > 100 {
                     return HttpResponse::UnprocessableEntity();
@@ -51,7 +51,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     let mut stringfied_birth = String::new();
 
     match &new_person.birth {
-        Some(birth) => {
+        Some(ref birth) => {
             if let Some(birth_str) = birth.as_str() {
                 let dateformat_regex = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
 
@@ -72,7 +72,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     let mut vectorized_techs = Vec::new();
 
     match &new_person.stack {
-        Some(stack) => {
+        Some(ref stack) => {
             if let Some(stack_vec) = stack.as_array() {
                 for tech in stack_vec.iter() {
                     if let Some(tech_str) = tech.as_str() {
