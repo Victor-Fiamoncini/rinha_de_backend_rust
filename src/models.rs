@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::FromRow;
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub struct NewPerson {
@@ -19,7 +20,7 @@ pub struct NewPerson {
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct StoredPerson {
-    pub id: String,
+    pub id: Uuid,
 
     pub nickname: String,
 
