@@ -10,7 +10,7 @@ use crate::{models::NewPerson, AppState};
 
 #[post("/pessoas")]
 async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -> impl Responder {
-    let mut stringfied_nickname = String::new();
+    let stringfied_nickname: String;
 
     match &new_person.nickname {
         Some(ref nickname) => {
@@ -29,7 +29,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         }
     }
 
-    let mut stringfied_name = String::new();
+    let stringfied_name: String;
 
     match &new_person.name {
         Some(ref name) => {
@@ -48,7 +48,7 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         }
     }
 
-    let mut stringfied_birth = String::new();
+    let stringfied_birth: String;
 
     match &new_person.birth {
         Some(ref birth) => {
