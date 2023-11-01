@@ -17,7 +17,9 @@ pub struct AppState {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
+    let api_port = env::var("API_PORT").expect("API_PORT env must be set");
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL env must be set");
+
     let postgres_pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)
@@ -38,7 +40,7 @@ async fn main() -> std::io::Result<()> {
             .service(fetch_person_by_term::fetch_person_by_term)
             .service(count_persons::count_persons)
     })
-    .bind(("127.0.0.1", 5555))?
+    .bind(format!("127.0.0.1:{api_port}"))?
     .run()
     .await
 }
