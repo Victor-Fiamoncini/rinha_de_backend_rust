@@ -33,11 +33,10 @@ async fn fetch_person_by_term(
         }
     }
 
-    let persons_by_term = sqlx::query_as!(
-        StoredPerson,
+    let persons_by_term = sqlx::query_as::<_, StoredPerson>(
         "SELECT p.id, p.nickname, p.name, p.birth, p.stack FROM persons p WHERE p.search_terms ILIKE $1 LIMIT 50",
-        format!("%{stringfied_query}%")
     )
+    .bind(format!("%{stringfied_query}%"))
     .fetch_all(&state.database_pool)
     .await;
 
