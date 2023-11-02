@@ -18,10 +18,11 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     let api_port = env::var("API_PORT").expect("API_PORT env must be set");
+    let database_pool = env::var("DATABASE_POOL").expect("DATABASE_POOL env must be set");
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL env must be set");
 
     let postgres_pool = PgPoolOptions::new()
-        .max_connections(10)
+        .max_connections(database_pool.parse::<u32>().unwrap())
         .connect(&database_url)
         .await
         .expect("Error to connect on Postgres database");
