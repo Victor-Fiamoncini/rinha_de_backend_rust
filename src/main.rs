@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
             .service(fetch_person_by_term::fetch_person_by_term)
             .service(count_persons::count_persons)
     })
-    .bind(format!("127.0.0.1:{api_port}"))?
+    .bind(format!("0.0.0.0:{api_port}"))?
     .run()
     .await
 }
