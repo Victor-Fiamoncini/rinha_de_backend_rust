@@ -1,22 +1,22 @@
 version: "3"
 
 services:
-    rinha_de_backend_postgres:
-        container_name: rinha_de_backend_postgres
-        image: postgres:15-alpine
-        ports:
-            - 5432:5432
-        env_file:
-            - .env
-        volumes:
-            - ./.docker/rinha_de_backend_postgres_data:/var/lib/postgresql/data:rw
-            - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
-        networks:
-            - rinha_de_backend
+  rinha_de_backend_postgres:
+    container_name: rinha_de_backend_postgres
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - ./.docker/rinha_de_backend_postgres_data:/var/lib/postgresql/data:rw
+      - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - rinha_de_backend
 
 networks:
-    rinha_de_backend:
-        driver: bridge
+  rinha_de_backend:
+    driver: bridge
 
 volumes:
   rinha_de_backend_postgres_data:
