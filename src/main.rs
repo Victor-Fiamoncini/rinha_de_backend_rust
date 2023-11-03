@@ -27,7 +27,10 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Error to connect on Postgres database");
 
-    println!("🚀 Server started successfully");
+    println!(
+        "{}",
+        format!("☕ Server started successfully on port {api_port}, with database pool of {database_pool}")
+    );
 
     HttpServer::new(move || {
         let app_state = AppState {
