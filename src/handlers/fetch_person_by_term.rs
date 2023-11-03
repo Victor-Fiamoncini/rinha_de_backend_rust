@@ -1,6 +1,5 @@
 use actix_web::{
-    get,
-    web::{self, Data},
+    web::{Data, Query},
     HttpResponse, Responder,
 };
 use serde::Deserialize;
@@ -8,28 +7,25 @@ use serde::Deserialize;
 use crate::{models::StoredPerson, AppState};
 
 #[derive(Deserialize)]
-struct FetchPersonByTermQueryParams {
+struct QueryParams {
     #[serde(rename(deserialize = "t"))]
     pub search: Option<String>,
 }
 
-#[get("/pessoas")]
-async fn fetch_person_by_term(
-    state: Data<AppState>,
-    query: web::Query<FetchPersonByTermQueryParams>,
-) -> impl Responder {
+#[actix_web::get("/pessoas")]
+async fn fetch_person_by_term(state: Data<AppState>, query: Query<QueryParams>) -> impl Responder {
     let stringfied_query: String;
 
     match &query.search {
         Some(ref term) => {
             if term.is_empty() || term.len() == 0 {
-                return HttpResponse::BadRequest().json(());
+                return HttpResponse::BadRequest().finish();
             }
 
             stringfied_query = term.to_string();
         }
         None => {
-            return HttpResponse::BadRequest().json(());
+            return HttpResponse::BadRequest().finish();
         }
     }
 
@@ -42,6 +38,6 @@ async fn fetch_person_by_term(
 
     match persons_by_term {
         Ok(persons) => HttpResponse::Ok().json(persons),
-        Err(_) => HttpResponse::NotFound().json(()),
+        Err(_) => HttpResponse::NotFound().finish(),
     }
 }

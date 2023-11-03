@@ -1,8 +1,8 @@
-use actix_web::{get, http::header::ContentType, web::Data, HttpResponse, Responder};
+use actix_web::{http::header::ContentType, web::Data, HttpResponse, Responder};
 
 use crate::{models::PersonsCount, AppState};
 
-#[get("/contagem-pessoas")]
+#[actix_web::get("/contagem-pessoas")]
 async fn count_persons(state: Data<AppState>) -> impl Responder {
     let persons_count = sqlx::query_as::<_, PersonsCount>("SELECT COUNT(*) AS count FROM persons")
         .fetch_one(&state.database_pool)
