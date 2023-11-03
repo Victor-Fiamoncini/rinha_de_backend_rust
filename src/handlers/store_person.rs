@@ -1,6 +1,5 @@
 use actix_web::{
-    post,
-    web::{self, Data},
+    web::{Data, Json},
     HttpResponse, Responder,
 };
 use regex::Regex;
@@ -8,24 +7,24 @@ use uuid::Uuid;
 
 use crate::{models::NewPerson, AppState};
 
-#[post("/pessoas")]
-async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -> impl Responder {
+#[actix_web::post("/pessoas")]
+async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> impl Responder {
     let stringfied_nickname: String;
 
     match &new_person.nickname {
         Some(ref nickname) => {
             if let Some(nickname_str) = nickname.as_str() {
                 if nickname_str.is_empty() || nickname_str.len() > 32 {
-                    return HttpResponse::UnprocessableEntity();
+                    return HttpResponse::UnprocessableEntity().finish();
                 }
 
                 stringfied_nickname = nickname_str.to_string();
             } else {
-                return HttpResponse::BadRequest();
+                return HttpResponse::BadRequest().finish();
             }
         }
         None => {
-            return HttpResponse::UnprocessableEntity();
+            return HttpResponse::UnprocessableEntity().finish();
         }
     }
 
@@ -35,16 +34,16 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         Some(ref name) => {
             if let Some(name_str) = name.as_str() {
                 if name_str.is_empty() || name_str.len() > 100 {
-                    return HttpResponse::UnprocessableEntity();
+                    return HttpResponse::UnprocessableEntity().finish();
                 }
 
                 stringfied_name = name_str.to_string();
             } else {
-                return HttpResponse::BadRequest();
+                return HttpResponse::BadRequest().finish();
             }
         }
         None => {
-            return HttpResponse::UnprocessableEntity();
+            return HttpResponse::UnprocessableEntity().finish();
         }
     }
 
@@ -56,16 +55,16 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
                 let dateformat_regex = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
 
                 if birth_str.is_empty() || !dateformat_regex.is_match(birth_str) {
-                    return HttpResponse::UnprocessableEntity();
+                    return HttpResponse::UnprocessableEntity().finish();
                 }
 
                 stringfied_birth = birth_str.to_string();
             } else {
-                return HttpResponse::BadRequest();
+                return HttpResponse::BadRequest().finish();
             }
         }
         None => {
-            return HttpResponse::UnprocessableEntity();
+            return HttpResponse::UnprocessableEntity().finish();
         }
     }
 
@@ -77,12 +76,12 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
                 for tech in stack_vec.iter() {
                     if let Some(tech_str) = tech.as_str() {
                         if tech_str.is_empty() || tech_str.len() > 32 {
-                            return HttpResponse::UnprocessableEntity();
+                            return HttpResponse::UnprocessableEntity().finish();
                         }
 
                         vectorized_techs.push(tech_str);
                     } else {
-                        return HttpResponse::BadRequest();
+                        return HttpResponse::BadRequest().finish();
                     }
                 }
             }
@@ -90,10 +89,12 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
         None => {}
     }
 
+    let person_id = Uuid::new_v4();
+
     let insert_result = sqlx::query(
         "INSERT INTO persons (id, nickname, name, birth, stack) VALUES ($1, $2, $3, $4, $5)",
     )
-    .bind(Uuid::new_v4())
+    .bind(person_id)
     .bind(stringfied_nickname)
     .bind(stringfied_name)
     .bind(stringfied_birth)
@@ -102,7 +103,9 @@ async fn store_person(state: Data<AppState>, new_person: web::Json<NewPerson>) -
     .await;
 
     match insert_result {
-        Ok(_) => HttpResponse::Created(),
-        Err(_) => HttpResponse::UnprocessableEntity(),
+        Ok(_) => HttpResponse::Created()
+            .append_header(("Location", format!("/pessoas/{person_id}")))
+            .finish(),
+        Err(_) => HttpResponse::UnprocessableEntity().finish(),
     }
 }
