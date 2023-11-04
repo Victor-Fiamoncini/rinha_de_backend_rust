@@ -5,13 +5,13 @@ use actix_web::{
 use regex::Regex;
 use uuid::Uuid;
 
-use crate::{models::NewPerson, AppState};
+use crate::{dto::NewPersonDTO, AppState};
 
 #[actix_web::post("/pessoas")]
-async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> impl Responder {
+async fn store_person(state: Data<AppState>, new_person_dto: Json<NewPersonDTO>) -> impl Responder {
     let stringfied_nickname: String;
 
-    match &new_person.nickname {
+    match &new_person_dto.nickname {
         Some(ref nickname) => {
             if let Some(nickname_str) = nickname.as_str() {
                 if nickname_str.is_empty() || nickname_str.len() > 32 {
@@ -30,7 +30,7 @@ async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> imp
 
     let stringfied_name: String;
 
-    match &new_person.name {
+    match &new_person_dto.name {
         Some(ref name) => {
             if let Some(name_str) = name.as_str() {
                 if name_str.is_empty() || name_str.len() > 100 {
@@ -49,7 +49,7 @@ async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> imp
 
     let stringfied_birth: String;
 
-    match &new_person.birth {
+    match &new_person_dto.birth {
         Some(ref birth) => {
             if let Some(birth_str) = birth.as_str() {
                 let dateformat_regex = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
@@ -68,9 +68,9 @@ async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> imp
         }
     }
 
-    let mut vectorized_techs = Vec::new();
+    let mut vectorized_stack = Vec::new();
 
-    match &new_person.stack {
+    match &new_person_dto.stack {
         Some(ref stack) => {
             if let Some(stack_vec) = stack.as_array() {
                 for tech in stack_vec.iter() {
@@ -79,7 +79,7 @@ async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> imp
                             return HttpResponse::UnprocessableEntity().finish();
                         }
 
-                        vectorized_techs.push(tech_str);
+                        vectorized_stack.push(tech_str);
                     } else {
                         return HttpResponse::BadRequest().finish();
                     }
@@ -91,16 +91,16 @@ async fn store_person(state: Data<AppState>, new_person: Json<NewPerson>) -> imp
 
     let person_id = Uuid::new_v4();
 
-    let insert_result = sqlx::query(
-        "INSERT INTO persons (id, nickname, name, birth, stack) VALUES ($1, $2, $3, $4, $5)",
-    )
-    .bind(person_id)
-    .bind(stringfied_nickname)
-    .bind(stringfied_name)
-    .bind(stringfied_birth)
-    .bind(vectorized_techs)
-    .execute(&state.database_pool)
-    .await;
+    let insert_result = state
+        .database
+        .insert_person(
+            person_id,
+            stringfied_nickname,
+            stringfied_name,
+            stringfied_birth,
+            vectorized_stack,
+        )
+        .await;
 
     match insert_result {
         Ok(_) => HttpResponse::Created()

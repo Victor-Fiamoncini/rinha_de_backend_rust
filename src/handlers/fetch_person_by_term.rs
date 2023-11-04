@@ -4,7 +4,7 @@ use actix_web::{
 };
 use serde::Deserialize;
 
-use crate::{models::StoredPerson, AppState};
+use crate::AppState;
 
 #[derive(Deserialize)]
 struct QueryParams {
@@ -29,15 +29,10 @@ async fn fetch_person_by_term(state: Data<AppState>, query: Query<QueryParams>) 
         }
     }
 
-    let persons_by_term = sqlx::query_as::<_, StoredPerson>(
-        "SELECT p.id, p.nickname, p.name, p.birth, p.stack FROM persons p WHERE p.search_terms ILIKE $1 LIMIT 50",
-    )
-    .bind(format!("%{stringfied_query}%"))
-    .fetch_all(&state.database_pool)
-    .await;
+    let select_result = state.database.select_person_by_term(stringfied_query).await;
 
-    match persons_by_term {
-        Ok(persons) => HttpResponse::Ok().json(persons),
+    match select_result {
+        Ok(ref persons) => HttpResponse::Ok().json(persons),
         Err(_) => HttpResponse::NotFound().finish(),
     }
 }
