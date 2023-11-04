@@ -17,5 +17,5 @@ pub struct StoredPersonModel {
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct PersonCountModel {
-    pub count: i32,
+    pub count: i64,
 }
