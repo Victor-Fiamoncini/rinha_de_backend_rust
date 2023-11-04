@@ -1,16 +1,19 @@
 use std::env;
 
 use actix_web::{self, web::Data, App, HttpServer};
+use database::Database;
 use dotenv::dotenv;
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::postgres::PgPoolOptions;
 
+mod database;
+mod dto;
 mod handlers;
-mod models;
+mod model;
 
 use handlers::{count_persons, fetch_person_by_id, fetch_person_by_term, store_person};
 
 pub struct AppState {
-    pub database_pool: Pool<Postgres>,
+    database: Database,
 }
 
 #[actix_web::main]
@@ -34,7 +37,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let app_state = AppState {
-            database_pool: postgres_pool.clone(),
+            database: Database::new(postgres_pool.clone()),
         };
 
         App::new()
