@@ -8,9 +8,9 @@ Ferramentas usadas:
 - Actix v4.4.0;
 - Postgres v15.
 
-## Resultados (testado por último em 03/11/2023)
+## Resultados (testado por último em 04/11/2023)
 
-![Resultados 03/11/2023](./.github/score-03-11-2023.png)
+![Resultados 03/11/2023](./.github/score-04-11-2023.png)
 
 ## Como iniciar (development build) 🛠
 
